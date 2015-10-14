@@ -146,6 +146,8 @@ namespace CentaurWarrunner
                     casted = true;
                 }
             }
+
+
    
             else if (hoofStomp.CanBeCasted())
             {
@@ -155,6 +157,14 @@ namespace CentaurWarrunner
                     Utils.Sleep(1000 + Game.Ping, "Q");
                     Utils.Sleep(100, "casting");
                     casted = true;
+                }
+                else
+                {
+                    var pos = target.Position
+                          + target.Vector3FromPolarAngle() * ((Game.Ping / 1000 + 0.3f) * target.MovementSpeed);               
+                    me.Move(pos);
+                    Utils.Sleep(200, "moveCloser");
+                    casted = false;
                 }
             }
             
