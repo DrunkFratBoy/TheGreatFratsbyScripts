@@ -109,35 +109,6 @@ namespace CentaurWarrunner
 
             } // end if  below casted
 
-            if (hoofStomp.CanBeCasted() && Utils.SleepCheck("Q") && enableQ)
-            {
-                var radius = hoofStomp.AbilityData.FirstOrDefault(x => x.Name == "stomp_radius").GetValue(0);
-                var pos = target.Position
-                          + target.Vector3FromPolarAngle() * ((Game.Ping / 1000 + 0.3f) * target.MovementSpeed);
-                if (mePosition.Distance(pos) < targetDistance)
-                {
-                    pos = target.Position;
-                }
-                if (mePosition.Distance2D(pos) <= (radius))
-                {
-                    var canUse = !target.IsStunned() && !target.IsHexed() && !target.IsInvul()
-                                 && !target.IsMagicImmune();
-                    if (canUse)
-                    {
-                        hoofStomp.UseAbility();
-                        Utils.Sleep(1000 + Game.Ping, "Q");
-                        Utils.Sleep(300, "casting");
-                        casted = true;
-                    }
-                }
-                else if (Utils.SleepCheck("moveCloser"))
-                {
-                    me.Move(pos);
-                    Utils.Sleep(200, "moveCloser");
-                    casted = false;
-                }
-            }
-
 
             if (blink != null && blink.CanBeCasted() && targetDistance > 400 && targetDistance < (blinkRange + hullsum)
                && Utils.SleepCheck("blink"))
@@ -169,12 +140,25 @@ namespace CentaurWarrunner
             {
                 if (mePosition.Distance2D(target) <= (Radius + hullsum))
                 {
-                    hoofStomp.UseAbility();
+                    doubleEdge.UseAbility(target);
                     Utils.Sleep(1000 + Game.Ping, "W");
                     Utils.Sleep(100, "casting");
                     casted = true;
                 }
             }
+   
+            else if (hoofStomp.CanBeCasted())
+            {
+                if (mePosition.Distance2D(target) <= (Radius + hullsum + 100))
+                {
+                    hoofStomp.UseAbility();
+                    Utils.Sleep(1000 + Game.Ping, "Q");
+                    Utils.Sleep(100, "casting");
+                    casted = true;
+                }
+            }
+            
+
 
             if (!Stampede.CanBeCasted() || !Utils.SleepCheck("R"))
             {
@@ -210,10 +194,10 @@ namespace CentaurWarrunner
 
             text.DrawText(
                 null,
-                enableQ ? "Centaur Warrunner: Q - DISABLED! | [G] for toggle" : "Centaur Warrunner: Q - ENABLED!! | [G] for toggle",
+                enableQ ? "Centaur Warrunner: Combo - DISABLED! | [G] for toggle" : "Centaur Warrunner: Combo - ENABLED!! | [G] for toggle",
                 5,
                 96,
-                Color.IndianRed);
+                Color.Green);
         }
 
         private static void Drawing_OnPostReset(EventArgs args)
@@ -328,6 +312,7 @@ namespace CentaurWarrunner
                 return;
             }
             enableQ = !enableQ;
+            enableW = !enableW;
         }
 
         private static void OrbWalk(float tick)
